@@ -90,6 +90,28 @@ class ServerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('testConnection')
+                    ->label('Test Connection')
+                    ->icon('heroicon-o-signal')
+                    ->action(function (Server $record) {
+                        \Illuminate\Support\Facades\Artisan::call('server:test', ['id' => $record->id]);
+                        $output = \Illuminate\Support\Facades\Artisan::output();
+
+                        if ($record->status === 'online') {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Connection Test Successful')
+                                ->body("Server {" . $record->name . "} is online.")
+                                ->success()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Connection Test Failed')
+                                ->body("Server {" . $record->name . "} is offline or unreachable. Output: " . $output)
+                                ->danger()
+                                ->send();
+                        }
+                    })
+                    ->visible(fn (Server $record): bool => Auth::user()->isAdmin() || Auth::user()->isDevOps()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

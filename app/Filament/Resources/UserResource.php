@@ -91,8 +91,7 @@ class UserResource extends Resource
                             ->success()
                             ->persistent()
                             ->send();
-                    })
-                    ->visible(fn (User $record): bool => $record->hasApiTokens()), // Only show if user can have API tokens
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
