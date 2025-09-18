@@ -132,18 +132,32 @@ class ServerResource extends Resource
                         if ($record->status === 'online') {
                             \Filament\Notifications\Notification::make()
                                 ->title('Connection Test Successful')
-                                ->body("Server {" . $record->name . "} is online.")
+                                ->body("Server " . $record->name . " is online.")
                                 ->success()
                                 ->send();
                         } else {
                             \Filament\Notifications\Notification::make()
                                 ->title('Connection Test Failed')
-                                ->body("Server {" . $record->name . "} is offline or unreachable. Output: " . $output)
+                                ->body("Server " . $record->name . " is offline or unreachable. Output: " . $output)
                                 ->danger()
                                 ->send();
                         }
                     })
                     ->visible(fn (Server $record): bool => Auth::user()->isAdmin() || Auth::user()->isDevOps()),
+                Tables\Actions\Action::make('scanServices')
+                    ->label('Scan Services')
+                    ->icon('heroicon-o-magnifying-glass')
+                    ->action(function (Server $record) {
+                        \Illuminate\Support\Facades\Artisan::call('service:scan', ['server_id' => $record->id]);
+                        $output = \Illuminate\Support\Facades\Artisan::output();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Service Scan Initiated')
+                            ->body("Service scan for server " . $record->name . " initiated. Check services list for updates. Output: " . $output)
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Server $record): bool => ($record->connection_type === 'push') && (Auth::user()->isAdmin() || Auth::user()->isDevOps())),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

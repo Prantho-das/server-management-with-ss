@@ -20,6 +20,14 @@ class Kernel extends ConsoleKernel
                 $this->call('server:test', ['id' => $server->id]);
             }
         })->everyFiveMinutes();
+
+        // Schedule the service:scan command for 'push' servers every 5 minutes
+        $schedule->call(function () {
+            $pushServers = Server::where('connection_type', 'push')->get();
+            foreach ($pushServers as $server) {
+                $this->call('service:scan', ['server_id' => $server->id]);
+            }
+        })->everyFiveMinutes();
     }
 
     /**

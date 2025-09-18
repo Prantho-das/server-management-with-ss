@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens; // Add this line
+use Illuminate\Database\Eloquent\Relations\HasMany; // Add this line
 
 class Server extends Model
 {
@@ -30,4 +31,12 @@ class Server extends Model
         'ssh_password' => 'encrypted', // New
         'ssh_private_key' => 'encrypted', // New
     ];
+
+    /**
+     * Get the services for the server.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
 }
