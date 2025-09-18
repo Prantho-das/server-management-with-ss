@@ -35,8 +35,40 @@ class ServerResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\Textarea::make('ssh_details')
-                    ->maxLength(65535),
+                Forms\Components\Select::make('connection_type')
+                    ->options([
+                        'pull' => 'Pull System (API Report)',
+                        'push' => 'Push System (SSH)',
+                    ])
+                    ->default('pull')
+                    ->required()
+                    ->live(), // Make it live to react to changes
+                Forms\Components\Group::make()
+                    ->visible(fn (Forms\Get $get): bool => $get('connection_type') === 'push')
+                    ->schema([
+                        Forms\Components\TextInput::make('ssh_username')
+                            ->maxLength(255)
+                            ->required(),
+                        Forms\Components\TextInput::make('ssh_port')
+                            ->numeric()
+                            ->default(22)
+                            ->required(),
+                        Forms\Components\Select::make('authentication_type')
+                            ->options([
+                                'password' => 'Password',
+                                'key' => 'Private Key',
+                            ])
+                            ->default('password')
+                            ->required()
+                            ->live(),
+                        Forms\Components\TextInput::make('ssh_password')
+                            ->password()
+                            ->maxLength(255)
+                            ->visible(fn (Forms\Get $get): bool => $get('authentication_type') === 'password'),
+                        Forms\Components\Textarea::make('ssh_private_key')
+                            ->maxLength(65535)
+                            ->visible(fn (Forms\Get $get): bool => $get('authentication_type') === 'key'),
+                    ]),
                 Forms\Components\TextInput::make('os')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('cpu')

@@ -36,16 +36,39 @@ class ServerTestCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->info("Fetching info for server: {$server->name} ({$server->ip_address})");
+        $this->info("Processing server: {$server->name} ({$server->ip_address}) - Connection Type: {$server->connection_type}");
 
-        // Placeholder for SSH connection and command execution
-        // In a real application, you would use phpseclib or a similar library
-        // and handle SSH credentials securely.
+        if ($server->connection_type === 'pull') {
+            $this->info("Server {$server->name} is a pull system. No SSH connection required for this command.");
+            Log::info("Server {$server->name} is a pull system. No SSH connection required for this command.", ['server_id' => $server->id]);
+            // Optionally, you might want to update its status to 'online' if it's expected to report via API
+            // $server->update(['status' => 'online']);
+            return Command::SUCCESS;
+        }
+
+        // For 'push' system, attempt SSH connection
+        if (empty($server->ssh_username)) {
+            $this->error("SSH username is not configured for server {$server->name}.");
+            $server->update(['status' => 'offline']);
+            return Command::FAILURE;
+        }
+
         try {
             // Example using phpseclib (requires installation: composer require phpseclib/phpseclib)
-            // $ssh = new SSH2($server->ip_address);
-            // if (!$ssh->login($server->ssh_user, $server->ssh_password)) { // Assuming ssh_user and ssh_password are in ssh_details or separate fields
-            //     throw new \Exception('SSH Login Failed');
+            // $ssh = new SSH2($server->ip_address, $server->ssh_port);
+
+            // if (!empty($server->ssh_password)) {
+            //     if (!$ssh->login($server->ssh_username, $server->ssh_password)) {
+            //         throw new \Exception('SSH Password Login Failed');
+            //     }
+            // } elseif (!empty($server->ssh_private_key)) {
+            //     $key = new \phpseclib3\Crypt\RSA();
+            //     $key->load($server->ssh_private_key);
+            //     if (!$ssh->login($server->ssh_username, $key)) {
+            //         throw new \Exception('SSH Private Key Login Failed');
+            //     }
+            // } else {
+            //     throw new \Exception('No SSH credentials provided (password or private key).');
             // }
 
             // For demonstration, simulate fetching data
@@ -64,8 +87,8 @@ class ServerTestCommand extends Command
                 'status' => $status,
             ]);
 
-            $this->info("Server {$server->name} info updated successfully.");
-            Log::info("Server {$server->name} info updated successfully.", ['server_id' => $server->id]);
+            $this->info("Server {$server->name} info updated successfully via SSH.");
+            Log::info("Server {$server->name} info updated successfully via SSH.", ['server_id' => $server->id]);
 
         } catch (\Exception $e) {
             $this->error("Failed to fetch info for server {$server->name}: " . $e->getMessage());

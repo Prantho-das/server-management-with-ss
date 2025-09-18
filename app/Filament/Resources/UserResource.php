@@ -80,18 +80,6 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('generateApiToken')
-                    ->label('Generate API Token')
-                    ->icon('heroicon-o-key')
-                    ->action(function (User $record) {
-                        $token = $record->createToken('api-token')->plainTextToken;
-                        Notification::make()
-                            ->title('API Token Generated')
-                            ->body('Your new API token: ' . $token)
-                            ->success()
-                            ->persistent()
-                            ->send();
-                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

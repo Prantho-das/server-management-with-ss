@@ -19,4 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/servers/{server}/report', [ServerReportController::class, 'report'])->middleware('auth:sanctum');
+Route::post('/servers/{server}/report', [ServerReportController::class, 'report']);
