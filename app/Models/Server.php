@@ -39,4 +39,28 @@ class Server extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+    /**
+     * Get the processes for the server.
+     */
+    public function processes(): HasMany
+    {
+        return $this->hasMany(Process::class);
+    }
+
+    /**
+     * Get the metrics for the server.
+     */
+    public function metrics(): HasMany
+    {
+        return $this->hasMany(Metric::class);
+    }
+
+    /**
+     * Get the alerts for the server.
+     */
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(Alert::class);
+    }
 }

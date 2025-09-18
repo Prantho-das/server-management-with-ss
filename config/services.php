@@ -29,10 +29,15 @@ return [
     ],
 
     'slack' => [
+        'webhook_url' => env('SLACK_WEBHOOK_URL'), // Added for webhook
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    'discord' => [
+        'webhook_url' => env('DISCORD_WEBHOOK_URL'),
     ],
 
 ];

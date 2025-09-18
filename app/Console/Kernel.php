@@ -13,21 +13,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Schedule the server:test command for all servers every 5 minutes
-        $schedule->call(function () {
-            $servers = Server::all();
-            foreach ($servers as $server) {
-                $this->call('server:test', ['id' => $server->id]);
-            }
-        })->everyFiveMinutes();
-
-        // Schedule the service:scan command for 'push' servers every 5 minutes
-        $schedule->call(function () {
-            $pushServers = Server::where('connection_type', 'push')->get();
-            foreach ($pushServers as $server) {
-                $this->call('service:scan', ['server_id' => $server->id]);
-            }
-        })->everyFiveMinutes();
+        // Schedule commands to run every 5 minutes
+        $schedule->command('server:test-all')->everyFiveMinutes();
+        $schedule->command('service:scan-all')->everyFiveMinutes();
+        $schedule->command('process:collect-all')->everyFiveMinutes();
+        $schedule->command('metrics:collect-all')->everyFiveMinutes();
+        $schedule->command('alerts:check')->everyFiveMinutes();
     }
 
     /**

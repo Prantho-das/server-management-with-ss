@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth; // Import Auth facade
+use App\Filament\Widgets\CpuMemoryChartWidget; // Import
+use App\Filament\Widgets\DiskUsageChartWidget; // Import
+use App\Filament\Widgets\ServiceStatusChartWidget; // Import
+use App\Livewire\ActiveProcessesTable; // Import
 
 class ServerResource extends Resource
 {
@@ -169,7 +173,7 @@ class ServerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ServicesRelationManager::class,
         ];
     }
 
