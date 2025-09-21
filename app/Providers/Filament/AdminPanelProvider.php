@@ -16,13 +16,14 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel = $panel
             ->default()
             ->id('admin')
             ->path('admin')
@@ -53,5 +54,33 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
+        if (class_exists(Setting::class) && Schema::hasTable('settings')) {
+            $settings = Cache::rememberForever('app_settings', function () {
+                return Setting::all()->pluck('value', 'key');
+            });
+
+            $theme = $settings->get('app_theme', 'default');
+            $themePath = 'resources/css/filament/admin/theme.css';
+            if ($theme !== 'default') {
+                $themePath = "resources/css/themes/{$theme}.css";
+            }
+            $panel->viteTheme($themePath);
+
+            $primaryColor = $settings->get('app_primary_color');
+            if ($primaryColor) {
+                $panel->colors([
+                    'primary' => Color::Amber,
+                ]);
+            }
+
+            $logo = $settings->get('app_logo');
+            if ($logo) {
+                $panel->brandLogo(asset('storage/' . $logo))
+                      ->brandLogoHeight('2rem');
+            }
+        }
+
+        return $panel;
     }
 }

@@ -127,7 +127,6 @@ class ProcessResource extends Resource
     {
         return [
             'index' => Pages\ListProcesses::route('/'),
-            'create' => Pages\CreateProcess::route('/create'),
             'edit' => Pages\EditProcess::route('/{record}/edit'),
         ];
     }

@@ -47,6 +47,13 @@ class ServerResource extends Resource
                     ->default('pull')
                     ->required()
                     ->live(), // Make it live to react to changes
+                Forms\Components\Select::make('os_type')
+                    ->options([
+                        'ubuntu' => 'Ubuntu/Debian',
+                        'centos' => 'CentOS/RHEL',
+                    ])
+                    ->default('ubuntu')
+                    ->required(),
                 Forms\Components\Group::make()
                     ->visible(fn (Forms\Get $get): bool => $get('connection_type') === 'push')
                     ->schema([
